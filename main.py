@@ -1,34 +1,57 @@
-#!/usr/bin/env python3
-"""News-image entry: copy the front-page image beside this file to the
-grader's output directory as entry.png.
+"""Entry script for the 19 November 2026 news-image bounty.
 
-Standard library only, no network, deterministic: the same bytes go out
-on every run. Outside the grader's container, MAKEFUN_OUTPUT_DIR stands
-in for /output:
+The artwork itself lives in entry.png next to this script; this program
+does no drawing of its own. Its only job is to place an exact copy of
+that picture where the grader looks for it -- entry.png inside the output
+folder, which is /output in the grading container and whatever
+MAKEFUN_OUTPUT_DIR names when the script is run by hand.
 
-    mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
-"""
+The run is fully repeatable: no network access, no clock, no randomness,
+and nothing but the Python standard library, so identical input bytes
+always yield identical output bytes. Once the copy lands, the script
+weighs both files and aborts loudly if their sizes disagree, so a short
+or truncated write can never slip through unnoticed."""
 
-import os
-import shutil
-
-
-def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    src = os.path.join(here, "entry.png")
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    os.makedirs(out_dir, exist_ok=True)
-    dst = os.path.join(out_dir, "entry.png")
-    # Byte-for-byte copy: the image is the entry, so the output must be
-    # identical to the source, verified by size below.
-    shutil.copyfile(src, dst)
-    expected = os.path.getsize(src)
-    written = os.path.getsize(dst)
-    if written != expected:
-        raise SystemExit(f"copy mismatch: {src} is {expected} bytes, "
-                         f"but {dst} is {written} bytes")
-    print(f"wrote {written} bytes to {dst}")
+from os import environ
+from pathlib import Path
 
 
-if __name__ == "__main__":
-    main()
+IMAGE_NAME = "entry.png"
+FALLBACK_FOLDER = "/output"
+OUTPUT_VARIABLE = "MAKEFUN_OUTPUT_DIR"
+
+
+def source_path():
+    """Return the picture bundled with this repository."""
+    return Path(__file__).resolve().parent.joinpath(IMAGE_NAME)
+
+
+def destination_path():
+    """Return where the graded copy belongs, creating the folder first."""
+    folder = Path(environ.get(OUTPUT_VARIABLE, FALLBACK_FOLDER))
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder.joinpath(IMAGE_NAME)
+
+
+def place_copy(origin, target):
+    """Write an exact copy of origin to target and report its size."""
+    payload = origin.read_bytes()
+    target.write_bytes(payload)
+    original_size = origin.stat().st_size
+    copied_size = target.stat().st_size
+    if copied_size != original_size:
+        raise SystemExit(
+            "copy failed: source holds %d bytes but the copy holds %d"
+            % (original_size, copied_size)
+        )
+    return copied_size
+
+
+def run():
+    picture = source_path()
+    goal = destination_path()
+    size = place_copy(picture, goal)
+    print("entry.png delivered: %d bytes written to %s" % (size, goal))
+
+
+if __name__ == "__main__": run()
