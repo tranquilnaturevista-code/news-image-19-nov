@@ -7,3 +7,11 @@
 A front page summing up the world's news of Thursday 19 November 2026 in one image, built for [make.fun's news-image-20261119 bounty](https://make.fun/bounty/news-image-20261119).
 
 `main.py` copies `entry.png` to `/output/entry.png`. The image is a newspaper front page: Trump, Xi and Putin meet for trilateral talks in Shenzhen as the APEC summit continues, House Democrats nominate Hakeem Jeffries 251-11 on his way to becoming the first Black Speaker, Anthropic prices its shares at $83 in the largest IPO ever, the International Court of Justice delivers its Rohingya genocide verdict on Myanmar, and the Crimean Bridge is hit again, closing the crossing.
+
+## Stories
+
+- Trump, Xi and Putin hold trilateral talks in Shenzhen as APEC continues.
+- House Democrats nominate Hakeem Jeffries 251-11, on his way to becoming the first Black Speaker.
+- Anthropic's $81.3bn IPO prices at $83 a share — the largest ever.
+- The ICJ delivers its Rohingya genocide verdict on Myanmar.
+- The Crimean Bridge is hit again and the crossing closes.
